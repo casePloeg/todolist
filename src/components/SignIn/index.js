@@ -104,6 +104,10 @@ class SignInGoogleBase extends Component {
     this.props.firebase
       .doSignInWithGoogle()
       .then(socialAuthUser => {
+        // Add a todo list for the user
+        this.props.firebase.db
+          .ref('/todosData/' + socialAuthUser.user.uid + '/0')
+          .set({ id: 0, completed: false, text: 'make a todo list' });
         // Create a user in your Firebase Realtime Database too
         return this.props.firebase.user(socialAuthUser.user.uid).set({
           username: socialAuthUser.user.displayName,
