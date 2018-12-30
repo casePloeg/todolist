@@ -3,6 +3,7 @@ import { withFirebase } from '../Firebase';
 import ToDoItem from '../TodoItem';
 import AddItem from '../AddItem';
 import Footer from '../Footer';
+import Header from '../Header';
 import '../../css/ToDo.css';
 
 class Todo extends Component {
@@ -76,16 +77,7 @@ class Todo extends Component {
               if (itemSnap.val()['completed']) {
                 compD = new Date(itemSnap.val()['completed']);
               }
-              console.log(
-                'today',
-                d,
-                'due',
-                itemSnap.val()['due'],
-                dueD,
-                'completed',
-                compD,
-                dueD < d,
-              );
+
               if (dueD && dueD < d && !compD) {
                 numOverdue++;
               }
@@ -180,6 +172,7 @@ class Todo extends Component {
 
         // update the totals
         this.runAllGetTodays();
+        console.log('delete finshed');
       });
     });
   }
@@ -189,7 +182,6 @@ class Todo extends Component {
   handleNewItem(today, value) {
     this.props.firebase.auth.onAuthStateChanged(user => {
       if (user) {
-        console.log('user logged in ' + value);
         // query for last inserted id
         this.props.firebase.db
           .ref('todosData/' + user.uid)
@@ -201,6 +193,15 @@ class Todo extends Component {
             if (snap.val() !== null) {
               // get the id for the next to be added item
               newId = parseInt(Object.keys(snap.val())[0]) + 1;
+            }
+            // check for priority
+
+            const priRegex = /^\(([A-Z])\)\s/;
+            const priMatches = value.match(priRegex);
+            let pri = '';
+
+            if (priMatches) {
+              pri = priMatches[1];
             }
 
             // could rewrite this to allow for any custom metadata to be input as long as it follows the : format
@@ -270,10 +271,11 @@ class Todo extends Component {
               .ref('todosData/' + user.uid + '/' + newId)
               .set({
                 id: newId,
-                text: today + ': ' + value,
+                text: value + ' ' + today,
                 completed: '',
                 created: today,
                 due: conv_due,
+                pri: pri,
               });
 
             // update the totals
@@ -314,16 +316,36 @@ class Todo extends Component {
     this.runAllGetTodays();
   }
 
+  sortByPriority(item1, item2) {
+    let res = 0;
+    if (!item2.pri && item1.pri) {
+      res = -1;
+    } else if (!item1.pri && item2.pri) {
+      res = 1;
+    } else if (item1.pri < item2.pri) {
+      res = -1;
+    } else if (item2.pri < item1.pri) {
+      res = 1;
+    } else {
+      res = 0;
+    }
+    //console.log(item1.pri, item2.pri, res);
+    return res;
+  }
+
   componentWillUnmount() {
     this.state.userDbRef.off();
     this.setState(() => null);
   }
 
   render() {
+    // currently set to also sort by priortiy, next step is to setup sort options / add more stuff
     let todoItems = null;
     if (this.state.todos) {
+      console.log('sorting started');
       todoItems = this.state.todos
         .filter(item => !item.completed)
+        .sort((a, b) => this.sortByPriority(a, b))
         .concat(this.state.todos.filter(item => item.completed))
         .map(item => (
           <ToDoItem
@@ -333,10 +355,25 @@ class Todo extends Component {
             deleteItem={this.deleteItem}
           />
         ));
+      /*
+        todoItems = this.state.todos
+        .filter(item => !item.completed)
+        .sort((a, b) => this.sortByPriority(a, b))
+        .concat(this.state.todos.filter(item => item.completed))
+        .map(item => (
+          <ToDoItem
+            key={item.id}
+            item={item}
+            handleChange={this.handleChange}
+            deleteItem={this.deleteItem}
+          />
+        ));
+        */
     }
 
     return (
       <div className="todo-list">
+        <Header />
         <AddItem handleNewItem={this.handleNewItem} />
         {todoItems}
 

@@ -32,6 +32,9 @@ const NavigationAuth = ({ authUser }) => (
     <li>
       <Link to={ROUTES.TODO}>Todo List</Link>
     </li>
+    <li>
+      <Link to={ROUTES.CONFIG}>Config</Link>
+    </li>
     {authUser.roles.includes(ROLES.ADMIN) && (
       <li>
         <Link to={ROUTES.ADMIN}>Admin</Link>
