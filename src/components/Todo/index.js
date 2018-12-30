@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withFirebase } from '../Firebase';
 import ToDoItem from '../TodoItem';
 import AddItem from '../AddItem';
+import Footer from '../Footer';
 import '../../css/ToDo.css';
 
 class Todo extends Component {
@@ -14,21 +15,135 @@ class Todo extends Component {
     this.deleteItem = this.deleteItem.bind(this);
   }
 
-  // handles the completed checkbox
-  handleChange(id) {
+  getNumToday(key) {
+    let numToday = 0;
     this.props.firebase.auth.onAuthStateChanged(user => {
       if (user) {
+        this.props.firebase.db
+          .ref('/todosData/' + user.uid)
+          .once('value')
+          .then(snap => {
+            snap.forEach(itemSnap => {
+              let d = new Date();
+              let today =
+                d.getFullYear() +
+                '-' +
+                (d.getMonth() + 1) +
+                '-' +
+                d.getDate();
+              if (itemSnap.val()[key] === today) {
+                numToday++;
+              }
+            });
+            // set state needs to be placed in the callback function because otherwise set state will be execute before promise is realized
+            this.setState(
+              prevState => (prevState[key + 'Today'] = numToday),
+            );
+          });
+      }
+    });
+  }
+
+  getCreatedToday() {
+    this.getNumToday('created');
+  }
+
+  getCompletedToday() {
+    this.getNumToday('completed');
+  }
+
+  getDueToday() {
+    this.getNumToday('due');
+  }
+
+  // determines how many items on the list are overdue.
+  // overdue means that the item is not completed and the due date was before the current date
+  getOverdue() {
+    let numOverdue = 0;
+    this.props.firebase.auth.onAuthStateChanged(user => {
+      if (user) {
+        this.props.firebase.db
+          .ref('/todosData/' + user.uid)
+          .once('value')
+          .then(snap => {
+            snap.forEach(itemSnap => {
+              let d = new Date(this.state.today);
+              let dueD = null;
+              if (itemSnap.val()['due']) {
+                dueD = new Date(itemSnap.val()['due']);
+              }
+              let compD = null;
+              if (itemSnap.val()['completed']) {
+                compD = new Date(itemSnap.val()['completed']);
+              }
+              console.log(
+                'today',
+                d,
+                'due',
+                itemSnap.val()['due'],
+                dueD,
+                'completed',
+                compD,
+                dueD < d,
+              );
+              if (dueD && dueD < d && !compD) {
+                numOverdue++;
+              }
+            });
+            // set state needs to be placed in the callback function because otherwise set state will be execute before promise is realized
+            this.setState(
+              prevState => (prevState['overdue'] = numOverdue),
+            );
+          });
+      }
+    });
+  }
+
+  runAllGetTodays() {
+    this.getDueToday();
+    this.getCompletedToday();
+    this.getCreatedToday();
+    this.getOverdue();
+  }
+
+  // handles the completed checkbox
+  handleChange(id, itemClass) {
+    this.props.firebase.auth.onAuthStateChanged(user => {
+      if (user) {
+        let uCompleted = '';
+        let uText = '';
+        if (itemClass === 'show') {
+          uText = this.state.todos[id].text.replace(
+            'x: ' + this.state.todos[id].completed,
+            '',
+          );
+          uCompleted = '';
+        } else {
+          const todayObj = new Date();
+          const todayStr =
+            todayObj.getFullYear() +
+            '-' +
+            (todayObj.getMonth() + 1) +
+            '-' +
+            todayObj.getDate();
+
+          uCompleted = todayStr;
+          uText =
+            'x: ' + uCompleted + ' ' + this.state.todos[id].text;
+        }
         let updates = {};
-        let uId = this.state.todos[id].id;
-        let uText = this.state.todos[id].text;
-        let uCompleted = !this.state.todos[id].completed;
-        updates['/todosData/' + user.uid + '/' + id] = {
-          id: uId,
-          text: uText,
-          completed: uCompleted,
-        };
+
+        updates[
+          '/todosData/' + user.uid + '/' + id + '/text'
+        ] = uText;
+        updates[
+          '/todosData/' + user.uid + '/' + id + '/completed'
+        ] = uCompleted;
+
         this.props.firebase.db.ref().update(updates);
       }
+      // update the totals
+      this.runAllGetTodays();
     });
   }
 
@@ -62,11 +177,16 @@ class Todo extends Component {
         this.props.firebase.db
           .ref('/todosData/' + user.uid)
           .update(updates);
+
+        // update the totals
+        this.runAllGetTodays();
       });
     });
   }
 
-  handleNewItem(value) {
+  // today - today's date in yyyy-mm-dd format
+  // value - the text entered by the user
+  handleNewItem(today, value) {
     this.props.firebase.auth.onAuthStateChanged(user => {
       if (user) {
         console.log('user logged in ' + value);
@@ -83,33 +203,115 @@ class Todo extends Component {
               newId = parseInt(Object.keys(snap.val())[0]) + 1;
             }
 
+            // could rewrite this to allow for any custom metadata to be input as long as it follows the : format
+
+            // check for a due date
+            // required to be in yyyy-mm-dd or a keyword day
+            const dateRegex = /(due:)((\d){4}-(\d){2}-(\d){2}|friday|monday|tuesday|thursday|wednesday|saturday|sunday|today|tomorrow)(\s)*/;
+            const dueMatches = value.match(dateRegex);
+            let due = '';
+            let conv_due = '';
+            // if there is a due date specified
+            if (dueMatches) {
+              // init array that converts day to number
+              const days = [
+                'sunday',
+                'monday',
+                'tuesday',
+                'wednesday',
+                'thursday',
+                'friday',
+                'saturday',
+              ];
+              // convert keywords to yyyy-mm-dd format
+              const todayDate = new Date();
+              due = dueMatches[2];
+              conv_due = due;
+              const dayOfWeek = todayDate.getDay();
+              const dueDayofWeek = days.indexOf(due);
+
+              if (due === 'today') {
+                conv_due = today;
+              } else if (due === 'tomorrow') {
+                conv_due = new Date(
+                  todayDate.getFullYear(),
+                  todayDate.getMonth(),
+                  todayDate.getDate() + 1,
+                );
+                conv_due =
+                  conv_due.getFullYear() +
+                  '-' +
+                  (conv_due.getMonth() + 1) +
+                  '-' +
+                  conv_due.getDate();
+              } else if (days.includes(due)) {
+                let deltaDays = (7 + (dueDayofWeek - dayOfWeek)) % 7;
+                // assume that the user means the next occurence of the day that isn't today
+                deltaDays = deltaDays === 0 ? 7 : deltaDays;
+                conv_due = new Date(
+                  todayDate.getFullYear(),
+                  todayDate.getMonth(),
+                  todayDate.getDate() + deltaDays,
+                );
+                conv_due =
+                  conv_due.getFullYear() +
+                  '-' +
+                  (conv_due.getMonth() + 1) +
+                  '-' +
+                  conv_due.getDate();
+              }
+              // end of conversion to yyyy-mm-dd
+
+              // convert the text to yyyy-mm-dd as well
+              value = value.replace(due, conv_due);
+            }
             // add the new item
             this.props.firebase.db
               .ref('todosData/' + user.uid + '/' + newId)
               .set({
                 id: newId,
-                text: value,
-                completed: false,
+                text: today + ': ' + value,
+                completed: '',
+                created: today,
+                due: conv_due,
               });
+
+            // update the totals
+            this.runAllGetTodays();
           });
       }
     });
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.props.firebase.auth.onAuthStateChanged(user => {
       if (user) {
         const dbRefObject = this.props.firebase.db.ref(
           '/todosData/' + user.uid,
         );
+        const todayDate = new Date();
+        const today =
+          todayDate.getFullYear() +
+          '-' +
+          (todayDate.getMonth() + 1) +
+          '-' +
+          todayDate.getDate();
 
         dbRefObject.on('value', snap => {
           this.setState(() => {
-            return { todos: snap.val(), userDbRef: dbRefObject };
+            return {
+              todos: snap.val(),
+              userDbRef: dbRefObject,
+              uid: user.id,
+              today: today,
+            };
           });
         });
       }
     });
+
+    // update the totals
+    this.runAllGetTodays();
   }
 
   componentWillUnmount() {
@@ -137,6 +339,14 @@ class Todo extends Component {
       <div className="todo-list">
         <AddItem handleNewItem={this.handleNewItem} />
         {todoItems}
+
+        <Footer
+          uid={this.state.uid}
+          createdToday={this.state.createdToday}
+          completedToday={this.state.completedToday}
+          dueToday={this.state.dueToday}
+          overdue={this.state.overdue}
+        />
       </div>
     );
   }

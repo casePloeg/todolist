@@ -22,8 +22,7 @@ class ToDoItem extends Component {
       prevState.itemClass = itemClass;
       return prevState;
     });
-    console.log('sup');
-    this.props.handleChange(id);
+    this.props.handleChange(id, itemClass);
   }
 
   render() {
