@@ -14,7 +14,13 @@ class Todo extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleNewItem = this.handleNewItem.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
+    this.handleFiter = this.handleFilter.bind(this);
+    this.handleSort = this.handleSort.bind(this);
   }
+
+  handleFilter() {}
+
+  handleSort() {}
 
   getNumToday(key) {
     let numToday = 0;
@@ -194,8 +200,8 @@ class Todo extends Component {
               // get the id for the next to be added item
               newId = parseInt(Object.keys(snap.val())[0]) + 1;
             }
-            // check for priority
 
+            // check for priority
             const priRegex = /^\(([A-Z])\)\s/;
             const priMatches = value.match(priRegex);
             let pri = '';
@@ -203,6 +209,29 @@ class Todo extends Component {
             if (priMatches) {
               pri = priMatches[1];
             }
+
+            // check for context
+            const contextRegex = /(\s@)(.*?)((?=\s@)|$|\s)/g;
+            let context = [];
+            let contextMatches;
+            // iterate through matches, use exec instead of //value.match(contextRegex);
+            while ((contextMatches = contextRegex.exec(value))) {
+              if (contextMatches) {
+                context.push(contextMatches[2]);
+              }
+            }
+
+            // check for project -> same as context
+            const projectRegex = /(\s\+)(.*?)((?=\s\+)|$|\s)/g;
+            let project = [];
+            let projectMatches;
+            // iterate through matches, use exec instead of //value.match(contextRegex);
+            while ((projectMatches = projectRegex.exec(value))) {
+              if (projectMatches) {
+                project.push(projectMatches[2]);
+              }
+            }
+            console.log(project);
 
             // could rewrite this to allow for any custom metadata to be input as long as it follows the : format
 
@@ -276,6 +305,8 @@ class Todo extends Component {
                 created: today,
                 due: conv_due,
                 pri: pri,
+                context: context,
+                project: project,
               });
 
             // update the totals
@@ -329,8 +360,24 @@ class Todo extends Component {
     } else {
       res = 0;
     }
-    //console.log(item1.pri, item2.pri, res);
     return res;
+  }
+
+  sortByContext(item1, item2) {}
+
+  /*
+  filterBy(tag, items) {
+    //context
+    if (tag.startsWith('@')) {
+    }
+    //project
+    else if (tag.startsWith('+')) {
+    }
+    return items.filter(item => item.text.includes(tag));
+  }
+  */
+  filterBy(item, tag) {
+    return item.text.includes(tag);
   }
 
   componentWillUnmount() {
@@ -342,11 +389,11 @@ class Todo extends Component {
     // currently set to also sort by priortiy, next step is to setup sort options / add more stuff
     let todoItems = null;
     if (this.state.todos) {
-      console.log('sorting started');
       todoItems = this.state.todos
         .filter(item => !item.completed)
         .sort((a, b) => this.sortByPriority(a, b))
         .concat(this.state.todos.filter(item => item.completed))
+        //.filter(item => this.filterBy(item, '@small'))
         .map(item => (
           <ToDoItem
             key={item.id}
@@ -355,25 +402,14 @@ class Todo extends Component {
             deleteItem={this.deleteItem}
           />
         ));
-      /*
-        todoItems = this.state.todos
-        .filter(item => !item.completed)
-        .sort((a, b) => this.sortByPriority(a, b))
-        .concat(this.state.todos.filter(item => item.completed))
-        .map(item => (
-          <ToDoItem
-            key={item.id}
-            item={item}
-            handleChange={this.handleChange}
-            deleteItem={this.deleteItem}
-          />
-        ));
-        */
     }
 
     return (
       <div className="todo-list">
-        <Header />
+        <Header
+          handleFilter={this.handleFilter}
+          handleChange={this.handleChange}
+        />
         <AddItem handleNewItem={this.handleNewItem} />
         {todoItems}
 
