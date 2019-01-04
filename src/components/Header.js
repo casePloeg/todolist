@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { withFirebase } from './Firebase';
+import FilterBar from './FilterBar';
 import '../css/Header.css';
 class Footer extends Component {
   constructor(props) {
@@ -25,6 +26,17 @@ toggle between hiding and showing the dropdown content */
   render() {
     return (
       <div>
+        <FilterBar
+          resetFilter={this.props.resetFilter}
+          setFilter={this.props.setFilter}
+        />
+        <button
+          type="submit"
+          onClick={() => this.props.toggleCompleted()}
+        >
+          Toggle Completed
+        </button>
+
         <div className="dropdown">
           <button
             type="submit"

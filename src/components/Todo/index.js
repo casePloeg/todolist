@@ -4,18 +4,30 @@ import ToDoItem from '../TodoItem';
 import AddItem from '../AddItem';
 import Footer from '../Footer';
 import Header from '../Header';
+import ItemList from '../ItemList';
 import '../../css/ToDo.css';
 
 class Todo extends Component {
   constructor(props) {
     super(props);
-    this.state = { todos: [] };
+    this.state = {
+      todos: [],
+      filter: '',
+      sort: '',
+      showCompleted: true,
+    };
+
+    // give the window this component so that methods can be called based off of strings
+    window.todoComponent = this;
 
     this.handleChange = this.handleChange.bind(this);
     this.handleNewItem = this.handleNewItem.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
     this.handleFiter = this.handleFilter.bind(this);
     this.handleSort = this.handleSort.bind(this);
+    this.resetFilter = this.resetFilter.bind(this);
+    this.setFilter = this.setFilter.bind(this);
+    this.toggleCompleted = this.toggleCompleted.bind(this);
   }
 
   handleFilter() {}
@@ -97,6 +109,7 @@ class Todo extends Component {
     });
   }
 
+  // runs all methods made to update information about current items
   runAllGetTodays() {
     this.getDueToday();
     this.getCompletedToday();
@@ -316,7 +329,7 @@ class Todo extends Component {
     });
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.firebase.auth.onAuthStateChanged(user => {
       if (user) {
         const dbRefObject = this.props.firebase.db.ref(
@@ -347,37 +360,92 @@ class Todo extends Component {
     this.runAllGetTodays();
   }
 
-  sortByPriority(item1, item2) {
-    let res = 0;
-    if (!item2.pri && item1.pri) {
-      res = -1;
-    } else if (!item1.pri && item2.pri) {
-      res = 1;
-    } else if (item1.pri < item2.pri) {
-      res = -1;
-    } else if (item2.pri < item1.pri) {
-      res = 1;
-    } else {
-      res = 0;
-    }
-    return res;
-  }
-
   sortByContext(item1, item2) {}
 
-  /*
-  filterBy(tag, items) {
-    //context
-    if (tag.startsWith('@')) {
-    }
-    //project
-    else if (tag.startsWith('+')) {
-    }
-    return items.filter(item => item.text.includes(tag));
-  }
-  */
   filterBy(item, tag) {
     return item.text.includes(tag);
+  }
+
+  filterItems(items) {
+    // get the tags that will be used to filter
+    const filters = this.state.filter.split();
+    filters.forEach(filter => {
+      // naive implementation
+      // fails when the user has text like '@abc wash the dog' and they filter for context @abc
+
+      // filter is a context or project a space must proceed
+      if (filter.startsWith('@') || filter.startsWith('+')) {
+        items = items.filter(item =>
+          item.text.includes(' ' + filter),
+        );
+      } else {
+        items = items.filter(item => item.text.includes(filter));
+      }
+    });
+
+    return items;
+  }
+
+  sortByPri(items) {
+    // sort and group @ the same time
+    // -> implement merge sort along w/ a check for cur vs. next element and put into the right group accordingly
+
+    // just group them ? what does sorting even mean in this context? firebase already does alphanumeric sorting automatically
+    let sortedItems = [];
+    let priorities = {};
+    items.forEach(item => {
+      if (priorities[item.pri] != undefined) {
+      } else {
+        priorities[item.pri] = sortedItems.length;
+        sortedItems.push([item.pri]);
+      }
+
+      const index = priorities[item.pri];
+      sortedItems[index].push(item);
+    });
+    sortedItems = sortedItems.sort((a, b) => {
+      if (a[0] && !b[0]) {
+        return -1;
+      } else if (!a[0] && b[0]) {
+        return 1;
+      } else {
+        return a[0].charCodeAt(0) - b[0].charCodeAt(0);
+      }
+    });
+    console.log(sortedItems);
+    return sortedItems;
+  }
+
+  sortItems(items) {
+    const sortType = this.state.sort;
+    // call the method sortBy<___> with the given items
+    const fName =
+      'sortBy' + sortType.charAt(0).toUpperCase() + sortType.slice(1);
+    const sortedItems = window.todoComponent[fName](items);
+    if (sortedItems.length > 0) {
+      console.log(sortedItems);
+      // change null category to n/a for display purposes
+      if (!sortedItems[sortedItems.length - 1][0]) {
+        sortedItems[sortedItems.length - 1][0] = 'n/a';
+      }
+    }
+
+    return sortedItems;
+  }
+
+  resetFilter() {
+    this.setState(prevState => (prevState['filter'] = ''));
+  }
+
+  setFilter(filter) {
+    this.setState(prevState => (prevState['filter'] = filter));
+  }
+
+  toggleCompleted() {
+    this.setState(
+      prevState =>
+        (prevState['showCompleted'] = !prevState['showCompleted']),
+    );
   }
 
   componentWillUnmount() {
@@ -389,19 +457,41 @@ class Todo extends Component {
     // currently set to also sort by priortiy, next step is to setup sort options / add more stuff
     let todoItems = null;
     if (this.state.todos) {
-      todoItems = this.state.todos
-        .filter(item => !item.completed)
-        .sort((a, b) => this.sortByPriority(a, b))
-        .concat(this.state.todos.filter(item => item.completed))
-        //.filter(item => this.filterBy(item, '@small'))
-        .map(item => (
-          <ToDoItem
-            key={item.id}
-            item={item}
-            handleChange={this.handleChange}
-            deleteItem={this.deleteItem}
-          />
-        ));
+      todoItems = this.state.todos;
+      if (this.state.filter) {
+        todoItems = this.filterItems(todoItems);
+      }
+
+      todoItems = todoItems.filter(item => !item.completed);
+      // if items that are completed are meant to be shown, add them to the items being displayed
+      if (this.state.showCompleted) {
+        todoItems = todoItems.concat(
+          this.state.todos.filter(item => item.completed),
+        );
+      }
+
+      if (this.state.sort) {
+        todoItems = this.sortItems(todoItems);
+        console.log(todoItems);
+      } else {
+        todoItems = [['', ...todoItems]];
+      }
+
+      todoItems = todoItems.map(cat => (
+        // change the null category to n/a for display purposes
+
+        <div>
+          <p>{cat[0]}</p>
+          {cat.slice(1).map(item => (
+            <ToDoItem
+              key={item.id}
+              item={item}
+              handleChange={this.handleChange}
+              deleteItem={this.deleteItem}
+            />
+          ))}
+        </div>
+      ));
     }
 
     return (
@@ -409,9 +499,12 @@ class Todo extends Component {
         <Header
           handleFilter={this.handleFilter}
           handleChange={this.handleChange}
+          setFilter={this.setFilter}
+          resetFilter={this.resetFilter}
+          toggleCompleted={this.toggleCompleted}
         />
         <AddItem handleNewItem={this.handleNewItem} />
-        {todoItems}
+        <ItemList items={todoItems} />
 
         <Footer
           uid={this.state.uid}
