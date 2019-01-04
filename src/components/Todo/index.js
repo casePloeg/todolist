@@ -27,6 +27,7 @@ class Todo extends Component {
     this.handleSort = this.handleSort.bind(this);
     this.resetFilter = this.resetFilter.bind(this);
     this.setFilter = this.setFilter.bind(this);
+    this.setSort = this.setSort.bind(this);
     this.toggleCompleted = this.toggleCompleted.bind(this);
   }
 
@@ -394,7 +395,7 @@ class Todo extends Component {
     let sortedItems = [];
     let priorities = {};
     items.forEach(item => {
-      if (priorities[item.pri] != undefined) {
+      if (priorities[item.pri] !== undefined) {
       } else {
         priorities[item.pri] = sortedItems.length;
         sortedItems.push([item.pri]);
@@ -439,6 +440,10 @@ class Todo extends Component {
 
   setFilter(filter) {
     this.setState(prevState => (prevState['filter'] = filter));
+  }
+
+  setSort(sortContext) {
+    this.setState(prevState => (prevState['sort'] = sortContext));
   }
 
   toggleCompleted() {
@@ -497,9 +502,8 @@ class Todo extends Component {
     return (
       <div className="todo-list">
         <Header
-          handleFilter={this.handleFilter}
-          handleChange={this.handleChange}
           setFilter={this.setFilter}
+          setSort={this.setSort}
           resetFilter={this.resetFilter}
           toggleCompleted={this.toggleCompleted}
         />
