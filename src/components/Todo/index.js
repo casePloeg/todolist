@@ -388,10 +388,6 @@ class Todo extends Component {
   }
 
   sortByPri(items) {
-    // sort and group @ the same time
-    // -> implement merge sort along w/ a check for cur vs. next element and put into the right group accordingly
-
-    // just group them ? what does sorting even mean in this context? firebase already does alphanumeric sorting automatically
     let sortedItems = [];
     let priorities = {};
     items.forEach(item => {
@@ -413,7 +409,75 @@ class Todo extends Component {
         return a[0].charCodeAt(0) - b[0].charCodeAt(0);
       }
     });
-    console.log(sortedItems);
+    //console.log(sortedItems);
+    return sortedItems;
+  }
+
+  sortByContext(items) {
+    let sortedItems = [];
+    let contexts = {};
+    items.forEach(item => {
+      if (!item.context) {
+        item.context = [''];
+      }
+      // iterate through the contexts
+      item.context.forEach(context => {
+        if (contexts[context] !== undefined) {
+        } else {
+          contexts[context] = sortedItems.length;
+          sortedItems.push([context]);
+        }
+
+        const index = contexts[context];
+        sortedItems[index].push(item);
+      });
+    });
+
+    sortedItems = sortedItems.sort((a, b) => {
+      if (a[0] && !b[0]) {
+        return -1;
+      } else if (!a[0] && b[0]) {
+        return 1;
+      } else {
+        return a[0].charCodeAt(0) - b[0].charCodeAt(0);
+      }
+    });
+
+    //console.log(sortedItems);
+    return sortedItems;
+  }
+
+  sortByProject(items) {
+    let sortedItems = [];
+    let projects = {};
+    items.forEach(item => {
+      if (!item.project) {
+        item.project = [''];
+      }
+      // iterate through the projects
+      item.project.forEach(project => {
+        if (projects[project] !== undefined) {
+        } else {
+          projects[project] = sortedItems.length;
+          sortedItems.push([project]);
+        }
+
+        const index = projects[project];
+        sortedItems[index].push(item);
+      });
+    });
+
+    sortedItems = sortedItems.sort((a, b) => {
+      if (a[0] && !b[0]) {
+        return -1;
+      } else if (!a[0] && b[0]) {
+        return 1;
+      } else {
+        return a[0].charCodeAt(0) - b[0].charCodeAt(0);
+      }
+    });
+
+    //console.log(sortedItems);
     return sortedItems;
   }
 

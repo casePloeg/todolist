@@ -38,10 +38,16 @@ class SortBar extends Component {
           >
             Priority
           </button>
-          <button type="submit" onClick={() => console.log('yeet')}>
+          <button
+            type="submit"
+            onClick={() => this.props.setSort('context')}
+          >
             Context
           </button>
-          <button type="submit" onClick={() => console.log('yeet')}>
+          <button
+            type="submit"
+            onClick={() => this.props.setSort('project')}
+          >
             Project
           </button>
         </div>
