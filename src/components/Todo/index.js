@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { withFirebase } from '../Firebase';
-import ToDoItem from '../TodoItem';
 import AddItem from '../AddItem';
 import Footer from '../Footer';
 import Header from '../Header';
@@ -13,6 +12,7 @@ class Todo extends Component {
     this.state = {
       todos: [],
       filter: '',
+      filters: [],
       sort: '',
       showCompleted: true,
     };
@@ -192,7 +192,6 @@ class Todo extends Component {
 
         // update the totals
         this.runAllGetTodays();
-        console.log('delete finshed');
       });
     });
   }
@@ -245,7 +244,6 @@ class Todo extends Component {
                 project.push(projectMatches[2]);
               }
             }
-            console.log(project);
 
             // could rewrite this to allow for any custom metadata to be input as long as it follows the : format
 
@@ -336,6 +334,13 @@ class Todo extends Component {
         const dbRefObject = this.props.firebase.db.ref(
           '/todosData/' + user.uid,
         );
+
+        // get the filters from the user's config
+        let filters;
+        this.props.firebase.db
+          .ref('/todosConfig/' + user.uid + '/filters')
+          .once('value')
+          .then(snap => (filters = snap.val()));
         const todayDate = new Date();
         const today =
           todayDate.getFullYear() +
@@ -351,6 +356,7 @@ class Todo extends Component {
               userDbRef: dbRefObject,
               uid: user.id,
               today: today,
+              filters: filters,
             };
           });
         });
@@ -361,7 +367,10 @@ class Todo extends Component {
     this.runAllGetTodays();
   }
 
-  sortByContext(item1, item2) {}
+  componentWillUnmount() {
+    this.state.userDbRef.off();
+    this.setState(() => null);
+  }
 
   filterBy(item, tag) {
     return item.text.includes(tag);
@@ -409,7 +418,6 @@ class Todo extends Component {
         return a[0].charCodeAt(0) - b[0].charCodeAt(0);
       }
     });
-    //console.log(sortedItems);
     return sortedItems;
   }
 
@@ -443,7 +451,6 @@ class Todo extends Component {
       }
     });
 
-    //console.log(sortedItems);
     return sortedItems;
   }
 
@@ -477,7 +484,6 @@ class Todo extends Component {
       }
     });
 
-    //console.log(sortedItems);
     return sortedItems;
   }
 
@@ -488,7 +494,6 @@ class Todo extends Component {
       'sortBy' + sortType.charAt(0).toUpperCase() + sortType.slice(1);
     const sortedItems = window.todoComponent[fName](items);
     if (sortedItems.length > 0) {
-      console.log(sortedItems);
       // change null category to n/a for display purposes
       if (!sortedItems[sortedItems.length - 1][0]) {
         sortedItems[sortedItems.length - 1][0] = 'n/a';
@@ -517,11 +522,6 @@ class Todo extends Component {
     );
   }
 
-  componentWillUnmount() {
-    this.state.userDbRef.off();
-    this.setState(() => null);
-  }
-
   render() {
     // currently set to also sort by priortiy, next step is to setup sort options / add more stuff
     let todoItems = null;
@@ -541,26 +541,9 @@ class Todo extends Component {
 
       if (this.state.sort) {
         todoItems = this.sortItems(todoItems);
-        console.log(todoItems);
       } else {
         todoItems = [['', ...todoItems]];
       }
-
-      todoItems = todoItems.map(cat => (
-        // change the null category to n/a for display purposes
-
-        <div>
-          <p>{cat[0]}</p>
-          {cat.slice(1).map(item => (
-            <ToDoItem
-              key={item.id}
-              item={item}
-              handleChange={this.handleChange}
-              deleteItem={this.deleteItem}
-            />
-          ))}
-        </div>
-      ));
     }
 
     return (
@@ -570,16 +553,25 @@ class Todo extends Component {
           setSort={this.setSort}
           resetFilter={this.resetFilter}
           toggleCompleted={this.toggleCompleted}
+          filters={this.state.filters}
         />
-        <AddItem handleNewItem={this.handleNewItem} />
-        <ItemList items={todoItems} />
 
+        <AddItem handleNewItem={this.handleNewItem} />
+
+        <ItemList
+          handleChange={this.handleChange}
+          deleteItem={this.deleteItem}
+          items={todoItems}
+        />
         <Footer
           uid={this.state.uid}
           createdToday={this.state.createdToday}
           completedToday={this.state.completedToday}
           dueToday={this.state.dueToday}
           overdue={this.state.overdue}
+          sort={this.state.sort}
+          filter={this.state.filter}
+          showCompleted={this.state.showCompleted}
         />
       </div>
     );

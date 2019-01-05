@@ -8,7 +8,6 @@ class SortBar extends Component {
   }
 
   showDropDown() {
-    console.log("yo what's good");
     if (this.state.dropClass) {
       this.setState(prevState => (prevState['dropClass'] = ''));
     } else {

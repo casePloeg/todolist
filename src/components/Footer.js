@@ -7,15 +7,29 @@ class Footer extends Component {
     this.state = {};
   }
 
-  componentWillMount() {}
-
   render() {
     return (
-      <div>
-        <p># completed today: {this.props.completedToday}</p>
-        <p># created today: {this.props.createdToday} </p>
-        <p># due today: {this.props.dueToday}</p>
-        <p># overdue: {this.props.overdue}</p>
+      <div className="todo-footer">
+        <div>
+          <p>
+            completed today: <span>{this.props.completedToday}</span>
+          </p>
+        </div>
+        <p>
+          # created today: <span>{this.props.createdToday}</span>{' '}
+        </p>
+        <p>
+          # due today: <span>{this.props.dueToday}</span>
+        </p>
+        <p>
+          # overdue: <span>{this.props.overdue}</span>
+        </p>
+        <p>
+          Filter: <span>{this.props.filter}</span>
+        </p>
+        <p>
+          Sort: <span>{this.props.sort}</span>
+        </p>
       </div>
     );
   }

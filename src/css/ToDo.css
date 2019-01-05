@@ -1,20 +1,46 @@
 body {
-  background-color: whitesmoke;
 }
-.todo-list {
-  background-color: white;
+
+.todo-header {
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
   margin: auto;
-  width: 50%;
+}
+
+.todo-add {
+  padding-top: 1rem;
+}
+.todo-add input {
+  width: 90%;
+}
+
+.todo-list {
+  --primary-color: #444444;
+  --secondary-color: yellow;
+
+  color: white;
+  background-color: whitesmoke;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
   display: flex;
   flex-direction: column;
-  align-items: center;
-  border: 1px solid #efefef;
-  box-shadow:
-    /* The top layer shadow */ 0 1px 1px
-      rgba(0, 0, 0, 0.15),
-    /* The second layer */ 0 10px 0 -5px #eee,
-    /* The second layer shadow */ 0 10px 1px -4px rgba(0, 0, 0, 0.15),
-    /* The third layer */ 0 20px 0 -10px #eee,
-    /* The third layer shadow */ 0 20px 1px -9px rgba(0, 0, 0, 0.15);
+  background-color: var(--primary-color);
+  margin: auto;
+  width: 50%;
+
   padding: 30px;
+}
+
+.todo-footer {
+  display: flex;
+  justify-content: center;
+}
+
+.todo-footer p {
+  margin: auto;
+}
+
+.todo-footer span {
+  color: var(--secondary-color);
 }

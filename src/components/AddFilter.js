@@ -3,16 +3,7 @@ import React, { Component } from 'react';
 class AddItem extends Component {
   search(e) {
     if (e.key === 'Enter') {
-      const todayObj = new Date();
-      const todayStr =
-        todayObj.getFullYear() +
-        '-' +
-        (todayObj.getMonth() + 1) +
-        '-' +
-        todayObj.getDate();
-
-      console.log();
-      this.props.handleNewItem(todayStr, e.target.value);
+      this.props.handleNewFilter(e.target.value);
       e.target.value = '';
     }
   }
@@ -20,6 +11,7 @@ class AddItem extends Component {
   render() {
     return (
       <div className="todo-add">
+        <h3>Add a filter:</h3>
         <input type="text" onKeyPress={event => this.search(event)} />
       </div>
     );

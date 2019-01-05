@@ -11,10 +11,11 @@ toggle between hiding and showing the dropdown content */
 
   render() {
     return (
-      <div>
+      <div className="todo-header">
         <FilterBar
           resetFilter={this.props.resetFilter}
           setFilter={this.props.setFilter}
+          filters={this.props.filters}
         />
         <SortBar setSort={this.props.setSort} />
         <button
