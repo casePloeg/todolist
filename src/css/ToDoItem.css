@@ -1,13 +1,16 @@
 .todo-item {
   display: flex;
-  margin: auto;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-
   width: 100%;
   border-bottom: 1px solid #cecece;
   font-weight: 100;
   font-size: 15px;
+}
+
+.list-text {
+  flex-grow: 1;
+  width: 70%;
 }
 
 input[type='checkbox'] {
@@ -22,4 +25,12 @@ input[type='checkbox']:focus {
 .completed {
   text-decoration: line-through;
   opacity: 0.5;
+}
+
+.list-buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  padding: 0.3rem;
 }

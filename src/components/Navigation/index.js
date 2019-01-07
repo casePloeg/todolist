@@ -19,42 +19,46 @@ const Navigation = () => (
 );
 
 const NavigationAuth = ({ authUser }) => (
-  <ul>
-    <li>
-      <Link to={ROUTES.LANDING}>Landing</Link>
-    </li>
-    <li>
-      <Link to={ROUTES.HOME}>Home</Link>
-    </li>
-    <li>
-      <Link to={ROUTES.ACCOUNT}>Account</Link>
-    </li>
-    <li>
-      <Link to={ROUTES.TODO}>Todo List</Link>
-    </li>
-    <li>
-      <Link to={ROUTES.CONFIG}>Config</Link>
-    </li>
-    {authUser.roles.includes(ROLES.ADMIN) && (
+  <nav className="menu">
+    <ul>
       <li>
-        <Link to={ROUTES.ADMIN}>Admin</Link>
+        <Link to={ROUTES.LANDING}>Landing</Link>
       </li>
-    )}
-    <li>
-      <SignOutButton />
-    </li>
-  </ul>
+      <li>
+        <Link to={ROUTES.HOME}>Home</Link>
+      </li>
+      <li>
+        <Link to={ROUTES.ACCOUNT}>Account</Link>
+      </li>
+      <li>
+        <Link to={ROUTES.TODO}>Todo List</Link>
+      </li>
+      <li>
+        <Link to={ROUTES.CONFIG}>Config</Link>
+      </li>
+      {authUser.roles.includes(ROLES.ADMIN) && (
+        <li>
+          <Link to={ROUTES.ADMIN}>Admin</Link>
+        </li>
+      )}
+      <li>
+        <SignOutButton />
+      </li>
+    </ul>
+  </nav>
 );
 
 const NavigationNonAuth = () => (
-  <ul>
-    <li>
-      <Link to={ROUTES.LANDING}>Landing</Link>
-    </li>
-    <li>
-      <Link to={ROUTES.SIGN_IN}>Sign In</Link>
-    </li>
-  </ul>
+  <nav className="menu">
+    <ul>
+      <li>
+        <Link to={ROUTES.LANDING}>Landing</Link>
+      </li>
+      <li>
+        <Link to={ROUTES.SIGN_IN}>Sign In</Link>
+      </li>
+    </ul>
+  </nav>
 );
 
 export default Navigation;

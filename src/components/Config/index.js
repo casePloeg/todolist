@@ -61,6 +61,7 @@ class ConfigPage extends Component {
 
     return (
       <div>
+        <h1>Current Filters:</h1>
         {filters}
         <AddFilter handleNewFilter={this.handleNewFilter} />
       </div>

@@ -33,13 +33,25 @@ class ToDoItem extends Component {
           checked={this.props.item.completed}
           onChange={() => this.handleChange(this.props.item.id)}
         />
-        <p>{this.props.item.text}</p>
-        <button
-          type="submit"
-          onClick={() => this.props.deleteItem(this.props.item.id)}
-        >
-          Delete
-        </button>
+        <div className={'list-text'}>
+          <p>{this.props.item.text}</p>
+        </div>
+
+        <div className="list-buttons">
+          <button
+            type="submit"
+            onClick={() => this.props.deleteItem(this.props.item.id)}
+          >
+            Edit
+          </button>
+
+          <button
+            type="submit"
+            onClick={() => this.props.deleteItem(this.props.item.id)}
+          >
+            Delete
+          </button>
+        </div>
       </div>
     );
   }

@@ -1,19 +1,9 @@
 import React, { Component } from 'react';
+import { withDropDown } from './DropDown.js';
 
 class FilterBar extends Component {
   constructor(props) {
     super(props);
-    this.state = { dropClass: '' };
-  }
-
-  showDropDown() {
-    if (this.state.dropClass) {
-      this.setState(prevState => (prevState['dropClass'] = ''));
-    } else {
-      this.setState(
-        prevState => (prevState['dropClass'] = 'showDrop'),
-      );
-    }
   }
 
   search(e) {
@@ -30,7 +20,11 @@ class FilterBar extends Component {
       filterButtons = this.props.filters.map(filter => (
         <button
           type="submit"
-          onClick={() => this.props.setFilter(filter)}
+          onClick={() => {
+            this.props.setFilter(filter);
+            this.props.showDropDown();
+          }}
+          onFocus={() => console.log('gained focus')}
         >
           {filter}
         </button>
@@ -39,6 +33,7 @@ class FilterBar extends Component {
 
     return (
       <div className="todo-filter">
+        {/*
         <input type="text" onKeyPress={event => this.search(event)} />
         <button
           type="submit"
@@ -46,20 +41,29 @@ class FilterBar extends Component {
         >
           Clear Filter
         </button>
+        */}
 
         <div className="dropdown">
           <button
             type="submit"
-            onClick={() => this.showDropDown()}
+            onClick={() => this.props.showDropDown()}
+            onBlur={() => console.log('lost focus')}
             className="dropbtn"
           >
-            Filter
+            New Filter
           </button>
           <div
             id="myDropdown"
-            className={'dropdown-content ' + this.state.dropClass}
+            className={'dropdown-content ' + this.props.dropClass}
           >
             {filterButtons}
+
+            <button
+              type="submit"
+              onClick={() => this.props.setFilter('')}
+            >
+              Clear
+            </button>
           </div>
         </div>
       </div>
@@ -67,4 +71,4 @@ class FilterBar extends Component {
   }
 }
 
-export default FilterBar;
+export default withDropDown(FilterBar);

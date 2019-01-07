@@ -5,8 +5,8 @@ class ItemList extends Component {
     const todoItems = this.props.items.map(cat => (
       // change the null category to n/a for display purposes
 
-      <div>
-        <p>{cat[0]}</p>
+      <div className="item-list">
+        <h3 className="category">{cat[0]}</h3>
         {cat.slice(1).map(item => (
           <ToDoItem
             key={item.id}

@@ -11,7 +11,7 @@ class AddItem extends Component {
   render() {
     return (
       <div className="todo-add">
-        <h3>Add a filter:</h3>
+        <h2>Add a filter:</h2>
         <input type="text" onKeyPress={event => this.search(event)} />
       </div>
     );

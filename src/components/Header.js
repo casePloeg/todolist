@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { withFirebase } from './Firebase';
-import FilterBar from './FilterBar';
-import SortBar from './SortBar';
+import SortWithDropDown from './SortWithDropDown.js';
+import FilterWithDropDown from './FilterWithDropDown.js';
+
 import '../css/Header.css';
 class Header extends Component {
   componentWillMount() {}
@@ -12,18 +13,20 @@ toggle between hiding and showing the dropdown content */
   render() {
     return (
       <div className="todo-header">
-        <FilterBar
-          resetFilter={this.props.resetFilter}
+        <FilterWithDropDown
           setFilter={this.props.setFilter}
           filters={this.props.filters}
+          resetFilter={this.props.resetFilter}
         />
-        <SortBar setSort={this.props.setSort} />
-        <button
-          type="submit"
-          onClick={() => this.props.toggleCompleted()}
-        >
-          Toggle Completed
-        </button>
+        <SortWithDropDown setSort={this.props.setSort} />
+        <div>
+          <button
+            type="submit"
+            onClick={() => this.props.toggleCompleted()}
+          >
+            Complete
+          </button>
+        </div>
       </div>
     );
   }
