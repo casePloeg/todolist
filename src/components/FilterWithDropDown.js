@@ -50,7 +50,7 @@ class FilterBar extends Component {
             onBlur={() => console.log('lost focus')}
             className="dropbtn"
           >
-            New Filter
+            Filter
           </button>
           <div
             id="myDropdown"

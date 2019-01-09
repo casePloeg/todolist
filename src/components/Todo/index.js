@@ -249,7 +249,7 @@ class Todo extends Component {
 
             // check for a due date
             // required to be in yyyy-mm-dd or a keyword day
-            const dateRegex = /(due:)((\d){4}-(\d){2}-(\d){2}|friday|monday|tuesday|thursday|wednesday|saturday|sunday|today|tomorrow)(\s)*/;
+            const dateRegex = /(due:)((\d){4}-(\d){1,2}-(\d){1,2}|friday|monday|tuesday|thursday|wednesday|saturday|sunday|today|tomorrow)(\s)*/;
             const dueMatches = value.match(dateRegex);
             let due = '';
             let conv_due = '';
@@ -349,6 +349,7 @@ class Todo extends Component {
           '-' +
           todayDate.getDate();
 
+        // get todo items
         dbRefObject.on('value', snap => {
           this.setState(() => {
             return {
@@ -357,6 +358,7 @@ class Todo extends Component {
               uid: user.id,
               today: today,
               filters: filters,
+              loading: false,
             };
           });
         });

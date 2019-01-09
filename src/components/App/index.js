@@ -14,14 +14,13 @@ import ConfigPage from '../Config';
 
 import * as ROUTES from '../../constants/routes';
 import { withAuthentication } from '../Session';
-//import '../../css/ToDo.css';
+
+import '../../css/App.css';
 
 const App = () => (
   <Router>
     <div>
       <Navigation />
-
-      <hr />
 
       <Route path={ROUTES.TODO} component={TodoPage} />
       <Route exact path={ROUTES.LANDING} component={LandingPage} />

@@ -5,10 +5,9 @@ import FilterWithDropDown from './FilterWithDropDown.js';
 
 import '../css/Header.css';
 class Header extends Component {
-  componentWillMount() {}
-
-  /* When the user clicks on the button, 
-toggle between hiding and showing the dropdown content */
+  constructor(props) {
+    super(props);
+  }
 
   render() {
     return (

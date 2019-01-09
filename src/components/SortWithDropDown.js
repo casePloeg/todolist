@@ -14,7 +14,7 @@ class SortBar extends Component {
           onClick={() => this.props.showDropDown()}
           className="dropbtn"
         >
-          New Sort
+          Sort
         </button>
         <div
           id="myDropdown"
