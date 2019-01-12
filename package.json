@@ -1,5 +1,6 @@
 {
-  "name": "react-firebase-authentication",
+  "homepage": "http://gitname.github.io/react-gh-pages",
+  "name": "todolist",
   "version": "0.0.1",
   "private": true,
   "dependencies": {
@@ -16,12 +17,17 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom --passWithNoTests",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "browserslist": [
     ">0.2%",
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "gh-pages": "^2.0.1"
+  }
 }
