@@ -10,11 +10,10 @@ class Footer extends Component {
   render() {
     return (
       <div className="todo-footer">
-        <div>
-          <p>
-            completed today: <span>{this.props.completedToday}</span>
-          </p>
-        </div>
+        <p>
+          completed today: <span>{this.props.completedToday}</span>
+        </p>
+
         <p>
           # created today: <span>{this.props.createdToday}</span>{' '}
         </p>

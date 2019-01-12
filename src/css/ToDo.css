@@ -3,15 +3,11 @@
   background-color: whitesmoke;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
-  display: flex;
-  flex-direction: column;
+  display: grid;
   background-color: var(--primary-color);
-  margin: auto;
-  margin-bottom: 1rem;
-  margin-top: 1rem;
-  width: 50%;
 
-  padding: 30px;
+  margin: 4rem auto;
+  width: 90vw;
 }
 
 .item-list .category {
@@ -97,6 +93,54 @@
   display: block;
 }
 
+.mobile-menu {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.mobile-menu button {
+  padding: 1rem;
+  background-color: #222222;
+  color: white;
+  border: none;
+}
+
+.mobile-menu button:active,
+button:hover {
+  transition: all 0.5s ease-out;
+  background-color: var(--secondary-color);
+  color: black;
+}
+
+.mobile-filter {
+  display: none;
+}
+
+.mobile-sort {
+  display: none;
+}
+
+.mobile-stats {
+  display: none;
+  text-align: center;
+}
+
+.mobile-show {
+  display: grid;
+  background-color: #333;
+}
+
+.mobile-show button {
+  padding: 1rem;
+  background-color: #333;
+  color: white;
+  border: none;
+}
+.mobile-menu .mobile-show {
+  background: var(--secondary-color);
+  color: black;
+}
+
 .todo-add {
   display: flex;
   align-content: center;
@@ -120,4 +164,12 @@
 
 .todo-footer span {
   color: var(--secondary-color);
+}
+
+.todo-footer {
+  display: none;
+}
+
+.todo-header {
+  display: none;
 }

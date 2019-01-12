@@ -117,7 +117,7 @@ class SignInGoogleBase extends Component {
       })
       .then(() => {
         this.setState({ error: null });
-        this.props.history.push(ROUTES.HOME);
+        this.props.history.push(ROUTES.TODO);
       })
       .catch(error => {
         if (error.code === ERROR_CODE_ACCOUNT_EXISTS) {

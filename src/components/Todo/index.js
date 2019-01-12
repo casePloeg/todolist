@@ -4,6 +4,7 @@ import AddItem from '../AddItem';
 import Footer from '../Footer';
 import Header from '../Header';
 import ItemList from '../ItemList';
+import MobileMenu from '../MobileMenu';
 import '../../css/ToDo.css';
 
 class Todo extends Component {
@@ -550,6 +551,20 @@ class Todo extends Component {
 
     return (
       <div className="todo-list">
+        <MobileMenu
+          toggleCompleted={this.toggleCompleted}
+          filters={this.state.filters}
+          setFilter={this.setFilter}
+          setSort={this.setSort}
+          resetFilter={this.resetFilter}
+          createdToday={this.state.createdToday}
+          completedToday={this.state.completedToday}
+          dueToday={this.state.dueToday}
+          overdue={this.state.overdue}
+          sort={this.state.sort}
+          filter={this.state.filter}
+          showCompleted={this.state.showCompleted}
+        />
         <Header
           setFilter={this.setFilter}
           setSort={this.setSort}

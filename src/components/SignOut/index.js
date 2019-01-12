@@ -19,14 +19,14 @@ class SignOutButton extends Component {
 
   render() {
     return (
-      <button
-        type="button"
+      <a
+        className="nav-link"
         onClick={() => {
           this.onClick();
         }}
       >
         Sign Out
-      </button>
+      </a>
     );
   }
 }

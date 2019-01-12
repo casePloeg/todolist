@@ -1,5 +1,6 @@
 body {
   --primary-color: #444;
+  --primary-color-darker: #222;
   --secondary-color: #eece1a;
 }
 
@@ -80,4 +81,12 @@ body {
 
 .nav-item:nth-child(3) {
   transition-delay: 3 * 0.7s;
+}
+
+@media screen and (max-width: 748px) {
+  .mobile-menu {
+    grid-template-columns: 1fr;
+    margin: none;
+    padding: none;
+  }
 }

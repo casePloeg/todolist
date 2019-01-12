@@ -10,6 +10,10 @@ class Navigation extends Component {
   constructor(props) {
     super(props);
     this.state = { showMenu: false, menuBtnClass: '', menuClass: '' };
+
+    //bound methods
+
+    this.toggleMenu = this.toggleMenu.bind(this);
   }
 
   toggleMenu() {
@@ -42,11 +46,15 @@ class Navigation extends Component {
           {authUser =>
             authUser ? (
               <NavigationAuth
+                toggleMenu={this.toggleMenu}
                 authUser={authUser}
                 menuClass={this.state.menuClass}
               />
             ) : (
-              <NavigationNonAuth menuClass={this.state.menuClass} />
+              <NavigationNonAuth
+                toggleMenu={this.toggleMenu}
+                menuClass={this.state.menuClass}
+              />
             )
           }
         </AuthUserContext.Consumer>
@@ -55,9 +63,9 @@ class Navigation extends Component {
   }
 }
 
-const NavigationAuth = ({ authUser, menuClass }) => (
+const NavigationAuth = ({ authUser, menuClass, toggleMenu }) => (
   <nav className={'menu ' + menuClass}>
-    <ul>
+    <ul onClick={() => toggleMenu()}>
       <li className={'nav-item ' + menuClass}>
         <Link className="nav-link" to={ROUTES.LANDING}>
           Landing
@@ -90,21 +98,25 @@ const NavigationAuth = ({ authUser, menuClass }) => (
           </Link>
         </li>
       )}
-      <li>
-        <SignOutButton />
+      <li className={'nav-item ' + menuClass}>
+        <SignOutButton className="nav-link" />
       </li>
     </ul>
   </nav>
 );
 
-const NavigationNonAuth = ({ menuClass }) => (
+const NavigationNonAuth = ({ menuClass, toggleMenu }) => (
   <nav className={'menu ' + menuClass}>
-    <ul>
-      <li className={'nav-item '}>
-        <Link to={ROUTES.LANDING}>Landing</Link>
+    <ul onClick={() => toggleMenu()}>
+      <li className={'nav-item ' + menuClass}>
+        <Link className="nav-link" to={ROUTES.LANDING}>
+          Landing
+        </Link>
       </li>
-      <li className={'nav-item '}>
-        <Link to={ROUTES.SIGN_IN}>Sign In</Link>
+      <li className={'nav-item ' + menuClass}>
+        <Link className="nav-link" to={ROUTES.SIGN_IN}>
+          Sign In
+        </Link>
       </li>
     </ul>
   </nav>

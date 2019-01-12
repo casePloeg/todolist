@@ -22,9 +22,12 @@ input[type='checkbox']:focus {
   outline: 0;
 }
 
-.completed {
+.completed p {
   text-decoration: line-through;
   opacity: 0.5;
+}
+.completed {
+  background: var(--primary-color-darker);
 }
 
 .list-buttons {
@@ -33,4 +36,12 @@ input[type='checkbox']:focus {
   flex-wrap: wrap;
   justify-content: flex-end;
   padding: 0.3rem;
+}
+
+.list-buttons button {
+  background: var(--primary-color-darker);
+  border: none;
+  color: white;
+  padding: 0.3rem;
+  margin-left: 1rem;
 }
